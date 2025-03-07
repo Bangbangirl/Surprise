@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: pink;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .message {
+            opacity: 0;
+            font-size: 2rem;
+            font-weight: 600;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .question {
+            opacity: 0;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-top: 10px;
+            color: white;
+            transition: opacity 2s ease-in-out;
+            position: relative;
+            top: -40px;
+        }
+
+        .options {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            flex-direction: column;
+            position: relative;
+            top: -20px;
+        }
+
+        .option {
+            background-color: white;
+            color: pink;
+            border: none;
+            font-size: 1.2rem;
+            padding: 15px 25px;
+            margin: 10px;
+            cursor: pointer;
+            opacity: 0;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background-color: lightpink;
+            transform: scale(1.05);
+        }
+
+        .image {
+            display: none;
+            margin-top: 30px;
+            transform: translateY(-100px);
+            animation: flyIn 1s forwards;
+        }
+
+        .image img {
+            width: 300px;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        @keyframes flyIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .image-caption {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .next-button {
+            background-color: yellow;
+            color: pink;
+            border: none;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 20px;
+            display: none;
+        }
+
+        .next-button:hover {
+            background-color: lightyellow;
+            color: pink;
+            transform: scale(1.05);
+        }
+
+        .final-summary {
+            display: none;
+            text-align: left;
+            margin-top: 30px;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .final-summary h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .final-summary p {
+            font-size: 1.8rem;
+            margin-top: 10px;
+            font-weight: 400;
+        }
+
+        .summary-item {
+            display: flex;
+            margin-bottom: 40px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .summary-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .summary-item img {
+            width: 250px;
+            height: auto;
+            border-radius: 10px;
+            margin: 0 20px;
+        }
+
+        .summary-item div {
+            width: 50%;
+        }
+
+        .download-btn {
+            background-color: white;
+            color: pink;
+            border: none;
+            font-size: 1rem;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 20px;
+        }
+
+        .download-btn:hover {
+            background-color: lightpink;
+            transform: scale(1.05);
+        }
+
+        .thank-you-page {
+            display: none;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .thank-you-page h1 {
+            font-size: 4rem;
+            font-weight: bold;
+        }
+
+        .thank-you-page p {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="bg-music.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <audio id="questionMusic" loop>
+        <source src="question-music.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <audio id="finalMusic" loop>
+        <source src="final-music.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="message" id="message1">💖Happy Birthday My Love💖</div>
+    <div class="message" id="message2">🎁This is your GIFT!🎁</div>
+    <div class="message" id="message3">👀But you have to answer to get your gift hehe😄</div>
+
+    <div class="question" id="question"></div>
+    <div class="options">
+        <button class="option" id="option1"></button>
+        <button class="option" id="option2"></button>
+        <button class="option" id="option3"></button>
+        <button class="option" id="option4"></button>
+    </div>
+
+    <div class="image" id="image"></div>
+    <div class="image-caption" id="imageCaption"></div>
+    <button class="next-button" id="nextButton">Next</button>
+
+    <!-- Final Summary Section -->
+    <div class="final-summary" id="finalSummary">
+        <h1>Happiest Birthday My Love</h1>
+        <div class="summary-item">
+            <div>
+                <h3>Question 1: ⌚When did we first meet?👨‍🤝‍👩</h3>
+                <p>Correct Answer: 26 October</p>
+                <button class="download-btn" onclick="downloadImage('gg(art).jpg')">Download Image</button>
+            </div>
+            <img src="gg(art).jpg" alt="✨First Meet✨">
+        </div>
+
+        <div class="summary-item">
+            <div>
+                <h3>Question 2: What nickname I use most often to call you?✨</h3>
+                <p>Correct Answer: Sir ji</p>
+                <button class="download-btn" onclick="downloadImage('gg2(finalart).jpg')">Download Image</button>
+            </div>
+            <img src="gg2(finalart).jpg" alt="Hehe~💖">
+        </div>
+
+        <div class="summary-item">
+            <div>
+                <h3>Question 3: How much do I love you?😍</h3>
+                <p>Correct Answer: Even after my death, I will not stop loving you and my soul will always look for you, not just for 7 janam but for every janam. My love 💖</p>
+                <button class="download-btn" onclick="downloadImage('gg3(art final).jpg')">Download Image</button>
+            </div>
+            <img src="gg3(art final).jpg" alt="I Love You">
+        </div>
+
+        <button class="next-button" id="nextButtonFinal" onclick="goToFinalPage()">Next</button>
+    </div>
+
+    <!-- Thank You Page -->
+    <div class="thank-you-page" id="thankYouPage">
+        <h1>Thank You My Love!</h1>
+        <p>
+            Thank you for playing this game! I hope you enjoyed the surprises. You mean the world to me, and I am so grateful for you.
+            I will always cherish our time together and look forward to creating even more beautiful memories. 
+            You are the light of my life. I love you!
+        </p>
+    </div>
+
+    <script>
+        let currentMessageIndex = 0;
+        let currentQuestionIndex = 0;
+
+        const messages = [
+            'Happy Birthday My Love',
+            'This is your gift',
+            'But you have to answer these questions to get your gifts hehe'
+        ];
+
+        const questions = [
+            { question: "👀When did we first meet?⌚", options: ["26 November👀", "26 October👨‍🤝‍👩", "27 November✨", "27 October⌚"], correctAnswer: 1, image: "gg(art).jpg", caption: "💖First Meet👨‍🤝‍👩" },
+            { question: "😍What nickname I use most often to call you?🩷", options: ["Bachu😍", "Sir ji😁", "Rasgulla🤍", "My Love💖"], correctAnswer: 1, image: "gg2(finalart).jpg", caption: "Hehe~🙈" },
+            { question: "💖How much do I love you?✨", options: ["Till my last breath😍", "To infinity and beyond~♾️", "Even after my death, I will not stop loving you and my soul will always look for you, not just for 7 janam but for every janam. My love 💖", "😍✨All of the above💖🙈"], correctAnswer: 2, image: "gg3(art final).jpg", caption: "I Love You💖♾️" }
+        ];
+
+        function fadeInMessage(id) {
+            const message = document.getElementById(id);
+            setTimeout(() => {
+                message.style.opacity = 1;
+            }, 1000);
+        }
+
+        function fadeOutMessage(id) {
+            const message = document.getElementById(id);
+            message.style.opacity = 0;
+        }
+
+        function startGame() {
+            fadeInMessage("message1");
+            
+            setTimeout(() => {
+                fadeOutMessage("message1");
+                fadeInMessage("message2");
+            }, 4000);
+            
+            setTimeout(() => {
+                fadeOutMessage("message2");
+                fadeInMessage("message3");
+                setTimeout(() => {
+                    fadeOutMessage("message3");
+                    displayQuestion();
+                }, 4000);
+            }, 8000);
+        }
+
+        function displayQuestion() {
+            const questionData = questions[currentQuestionIndex];
+            document.getElementById("question").textContent = questionData.question;
+            document.getElementById("option1").textContent = questionData.options[0];
+            document.getElementById("option2").textContent = questionData.options[1];
+            document.getElementById("option3").textContent = questionData.options[2];
+            document.getElementById("option4").textContent = questionData.options[3];
+
+            if (currentQuestionIndex === 1 || currentQuestionIndex === 2) {
+                document.getElementById("option4").style.display = 'none';
+            } else {
+                document.getElementById("option4").style.display = 'block';
+            }
+
+            document.getElementById("question").style.opacity = 1;
+            document.getElementById("option1").style.opacity = 1;
+            document.getElementById("option2").style.opacity = 1;
+            document.getElementById("option3").style.opacity = 1;
+        }
+
+        function handleAnswer(answerIndex) {
+            const questionData = questions[currentQuestionIndex];
+            const imageElement = document.getElementById("image");
+            const imageCaptionElement = document.getElementById("imageCaption");
+            const nextButton = document.getElementById("nextButton");
+
+            if (answerIndex === questionData.correctAnswer) {
+                imageElement.innerHTML = `<img src="${questionData.image}" alt="Surprise">`;
+                imageCaptionElement.textContent = questionData.caption; 
+                imageElement.style.display = 'block';
+                imageElement.style.animation = 'flyIn 1s forwards';
+                imageCaptionElement.style.display = 'block';
+                nextButton.style.display = 'block'; 
+            } else {
+                alert("Try again!");
+            }
+        }
+
+        function nextQuestion() {
+            const nextButton = document.getElementById("nextButton");
+            nextButton.style.display = 'none'; 
+            const imageElement = document.getElementById("image");
+            const imageCaptionElement = document.getElementById("imageCaption");
+
+            imageElement.style.display = 'none'; 
+            imageCaptionElement.style.display = 'none';
+
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                showFinalSummary();
+            }
+        }
+
+        function showFinalSummary() {
+            document.getElementById("finalMusic").play();
+            const finalSummary = document.getElementById("finalSummary");
+            finalSummary.style.display = 'block';
+            finalSummary.style.opacity = 1;
+        }
+
+        function goToFinalPage() {
+            document.getElementById("finalSummary").style.display = 'none';
+            document.getElementById("thankYouPage").style.display = 'block'; 
+        }
+
+        function downloadImage(imageName) {
+            const link = document.createElement("a");
+            link.href = imageName; 
+            link.download = imageName;
+            link.click();
+        }
+
+        // Attach next button event to nextQuestion function
+        document.getElementById("nextButton").onclick = nextQuestion;
+
+        // Trigger question and answers when clicking
+        document.getElementById("option1").onclick = function() { handleAnswer(0); };
+        document.getElementById("option2").onclick = function() { handleAnswer(1); };
+        document.getElementById("option3").onclick = function() { handleAnswer(2); };
+        document.getElementById("option4").onclick = function() { handleAnswer(3); };
+
+        // Start the game
+        startGame();
+    </script>
+
+</body>
+</html>
